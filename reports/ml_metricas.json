@@ -1,0 +1,93 @@
+{
+  "sha256_gold": "2718ad6c88b52da2914b54e5f6eccb51815a2ff3c59100793c093292f900c60c",
+  "versiones": {
+    "python": "3.14.5",
+    "pandas": "3.0.3",
+    "numpy": "2.4.6",
+    "sklearn": "1.9.0"
+  },
+  "predictores": [
+    "lead_time",
+    "total_nights",
+    "adults",
+    "children",
+    "babies",
+    "children_missing",
+    "hotel",
+    "arrival_date_month",
+    "meal",
+    "market_segment",
+    "distribution_channel",
+    "reserved_room_type",
+    "customer_type"
+  ],
+  "filas": {
+    "train": 48428,
+    "purga": 30386,
+    "prueba": 26565,
+    "validacion": 14011
+  },
+  "prevalencia_train": 0.3580573222102916,
+  "evaluacion": {
+    "validacion": {
+      "baseline": {
+        "n": 14011,
+        "prevalencia": 0.26172293198201413,
+        "tp": 714,
+        "fp": 2085,
+        "fn": 2953,
+        "tn": 8259,
+        "precision": 0.25509110396570206,
+        "recall": 0.19470957185710389,
+        "fpr": 0.2015661252900232,
+        "ap": 0.26172293198201413,
+        "roc_auc": 0.5,
+        "brier": 0.20250435359740618
+      },
+      "logistica": {
+        "n": 14011,
+        "prevalencia": 0.26172293198201413,
+        "tp": 1003,
+        "fp": 1796,
+        "fn": 2664,
+        "tn": 8548,
+        "precision": 0.35834226509467665,
+        "recall": 0.27352058903736026,
+        "fpr": 0.17362722351121423,
+        "ap": 0.3647154156425725,
+        "roc_auc": 0.6164799192480076,
+        "brier": 0.1901845701474544
+      }
+    },
+    "prueba": {
+      "baseline": {
+        "n": 26565,
+        "prevalencia": 0.3162808206286467,
+        "tp": 1681,
+        "fp": 3629,
+        "fn": 6721,
+        "tn": 14534,
+        "precision": 0.31657250470809795,
+        "recall": 0.2000714115686741,
+        "fpr": 0.19980179485767768,
+        "ap": 0.3162808206286467,
+        "roc_auc": 0.5,
+        "brier": 0.21799253921551767
+      },
+      "logistica": {
+        "n": 26565,
+        "prevalencia": 0.3162808206286467,
+        "tp": 2650,
+        "fp": 2660,
+        "fn": 5752,
+        "tn": 15503,
+        "precision": 0.4990583804143126,
+        "recall": 0.31540109497738633,
+        "fpr": 0.14645157738259099,
+        "ap": 0.4788920803727832,
+        "roc_auc": 0.6813030119236967,
+        "brier": 0.20144534352532115
+      }
+    }
+  }
+}
