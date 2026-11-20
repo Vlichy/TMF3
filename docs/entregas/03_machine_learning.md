@@ -1,8 +1,10 @@
 # Entrega 03 · Machine Learning
 
-Las ampliaciones al final de este documento responden al feedback del profesor. La sección final de cola persistente recoge la evaluación más reciente y sus límites para el MVP. Los cinco apartados iniciales conservan el experimento mensual original.
+La revisión final del 21/11/2026 cierra las observaciones del profesor en el alcance académico de las simulaciones retrospectivas. Los cinco apartados iniciales conservan el experimento mensual original. Las dos ampliaciones se evalúan sobre poblaciones distintas. La conclusión vigente está en la sección final de cierre académico.
 
 ## 1. Qué problema resuelve el modelo
+
+El caso de uso original contempla revisar a las 09:00 las reservas activas dos días antes de la llegada. Ese instante exige conocer el estado y las variables tal como estaban disponibles entonces. Los experimentos de esta entrega estudian aproximaciones retrospectivas con otros instantes y ventanas de decisión.
 
 El equipo de reservas necesita decidir qué reservas revisar primero cuando no puede revisar todas. El modelo aborda una clasificación binaria supervisada y ordena reservas por riesgo de cancelación. El equipo puede comprobar datos o decidir si procede un contacto de seguimiento. La decisión queda en manos del equipo. El experimento mide detección de cancelaciones históricas y carece de datos de intervención para estimar cuántas se evitarían.
 
@@ -57,9 +59,9 @@ Evidencias reproducibles en [métricas](../../reports/ml_metricas.json), [partic
 
 ## 5. Decisión y uso en el producto
 
-Se elige la logística para un MVP retrospectivo y supervisado. Con el mismo cupo mejora la precisión en 18,25 puntos porcentuales y localiza 969 cancelaciones adicionales en prueba. La concentración en el hotel urbano y la baja cobertura del canal directo desaconsejan aplicar la política global como única cola de seguimiento en operación. Para un piloto operativo se necesitan snapshots de alta, evaluación prospectiva por hotel y canal y una medición de la capacidad y los costes reales. El histórico de dos hoteles portugueses de 2015–2017 limita la generalización a la operación actual.
+En el experimento mensual original se seleccionó la logística como candidata para un MVP retrospectivo y supervisado. Con el mismo cupo mejora la precisión en 18,25 puntos porcentuales y localiza 969 cancelaciones adicionales en prueba. La concentración en el hotel urbano y la baja cobertura del canal directo desaconsejan aplicar la política global como única cola de seguimiento en operación. Para un piloto operativo se necesitan snapshots de alta, evaluación prospectiva por hotel y canal y una medición de la capacidad y los costes reales. El histórico de dos hoteles portugueses de 2015–2017 limita la generalización a la operación actual.
 
-El frontal consumiría un identificador de reserva interno, una puntuación de riesgo de 0 a 1, una posición dentro del lote y un indicador de prioridad. El score ordena la revisión y carece de calibración acreditada como probabilidad individual. La prioridad depende del lote disponible y del cupo. La simulación usa meses completos retrospectivos. Para ofrecer una cola durante el mes habría que validar una cadencia de lotes y un cupo disponibles en cada decisión. Una alerta sirve para revisión humana y no desencadena cancelaciones, cambios de precio ni contactos automáticos.
+El frontal consumiría un identificador de reserva interno, una puntuación de riesgo de 0 a 1, una posición dentro del lote y un indicador de prioridad. El score ordena la revisión y carece de calibración acreditada como probabilidad individual. La prioridad depende del lote disponible y del cupo. El experimento original usa meses completos retrospectivos. Las ampliaciones posteriores estudian cohortes semanales y una cola persistente. La sección final delimita su relación con el uso a las 09:00 dos días antes de la llegada. Una alerta sirve para revisión humana y no desencadena cancelaciones, cambios de precio ni contactos automáticos.
 
 ## Verificación y reproducción
 
@@ -137,7 +139,7 @@ En Resort Hotel la logística mejora frente a la regla sencilla, con 173 TP adic
 
 ### Decisión actualizada y límites
 
-La evidencia semanal mantiene la elección de la logística para explorar una cola supervisada orientada a detectar cancelaciones con capacidad limitada. La política global pierde cobertura en el hotel vacacional frente al seguimiento sin información individual. Si el producto debe garantizar cobertura en ambos hoteles, hace falta evaluar explícitamente una asignación de capacidad por hotel antes de decidir su uso operativo. La regla por hotel y antelación resulta insuficiente para corregir esa concentración.
+La primera ampliación semanal respaldó la logística como candidata para explorar una cola supervisada orientada a detectar cancelaciones con capacidad limitada. La política global pierde cobertura en el hotel vacacional frente al seguimiento sin información individual. Si el producto debe garantizar cobertura en ambos hoteles, hace falta evaluar explícitamente una asignación de capacidad por hotel antes de decidir su uso operativo. La regla por hotel y antelación resulta insuficiente para corregir esa concentración.
 
 La simulación reduce el uso de información de reservas futuras al ordenar, pero siguen pendientes la fecha real de alta, los snapshots iniciales y el historial de estados. El último estado fechado aproxima cuándo se conoció un desenlace y podría reflejar una actualización tardía. La espera semanal excluye cancelaciones rápidas y reservas de llegada inmediata. Las métricas describen cancelaciones detectables entre los elegibles al cierre, con efectos de contacto y rentabilidad aún sin medir.
 
@@ -235,3 +237,90 @@ python -B -m src.persistent_queue
 python -B -m unittest discover -s tests -v
 ```
 
+## Cierre académico de las observaciones del profesor · 21/11/2026
+
+**OBSERVACIÓN DEL PROFESOR RESUELTA**
+
+El cierre se refiere a la petición de evaluar semanalmente las reservas disponibles, compararlas con una regla por hotel y antelación y estudiar el hotel vacacional. Las simulaciones y sus resultados quedan acreditados bajo las reglas temporales explícitas del histórico. La validación del funcionamiento real a las 09:00 dos días antes de la llegada queda pendiente de datos operativos.
+
+### Tres experimentos con poblaciones diferenciadas
+
+| Experimento | Población de prueba y unidad de evaluación | Decisión y capacidad | Comparación |
+| --- | --- | --- | --- |
+| Original mensual, informes `ml_*` | 26.565 reservas con alta estimada desde enero de 2017, una fila por reserva | Mes completo de altas. 5.310 prioridades, 20% mensual redondeado | Baseline global y logística |
+| Primera ampliación, informes `semanal_*` | 18.929 reservas elegibles de nuevas altas en 34 semanas. una oportunidad por reserva | Lunes 00:00. 3.771 prioridades, 20% del lote semanal elegible | Baseline global, tasa por hotel y antelación y logística |
+| Segunda ampliación, informes `cola_persistente_*` | 24.097 IDs distintos con alguna oportunidad en 35 lunes. cada ID cuenta una vez en métricas acumuladas | Lunes 00:00. llegadas en los próximos 28 días. 15.416 seguimientos únicos por política | Misma logística con cupo global o proporcional por hotel |
+
+La primera ampliación obtiene 1.322 TP con logística frente a 1.074 con la regla por hotel y antelación, a igual capacidad. En Resort Hotel obtiene 186 frente a 13 con esa regla y 270 con el baseline global. La ventaja sobre la regla sencilla coexiste con una cobertura vacacional inferior a la referencia sin información individual.
+
+La segunda ampliación incluye backlog y oportunidades repetidas antes de llegar. El 20% semanal se aplica al stock activo en cada lunes y acaba cubriendo el 63,97% de los IDs accesibles. Este cambio de universo y de exposición acumulada impide atribuir las diferencias frente a las métricas mensuales o de cohortes semanales exclusivamente a la calidad del modelo.
+
+### Resultados de la cola persistente verificados
+
+Las cifras se recalcularon desde los eventos, se contrastaron con los JSON y CSV y se reprodujeron ejecutando el script.
+
+| Indicador | Global | Por hotel |
+| --- | ---: | ---: |
+| Seguimientos simulados únicos | 15.416 | 15.416 |
+| Cancelaciones detectadas | 1.867 | 1.796 |
+| Precisión | 12,11% | 11,65% |
+| Recall global | 64,16% | 61,72% |
+| Recall Resort Hotel | 31,31% | 63,43% |
+| Recall City Hotel | 77,85% | 61,00% |
+
+El denominador común del recall global son las 2.910 cancelaciones entre los 24.097 IDs accesibles. Los recall por hotel usan las 856 cancelaciones de Resort Hotel y las 2.054 de City Hotel. La precisión divide los TP entre los 15.416 seguimientos simulados de cada política. La aparición repetida de una reserva pendiente entre eventos mantiene una sola contribución por ID a estos denominadores.
+
+### Interpretación de la discriminación, la priorización y la cobertura
+
+La capacidad de discriminación se refiere a ordenar puntuaciones entre clases a lo largo del ranking. En la primera simulación semanal, la logística alcanza ROC-AUC 0,6264 y AP 0,3273 en prueba, frente a 0,6025 y 0,2845 de la regla por hotel y antelación, sobre la misma población. La precisión obtenida por una política concreta depende además de las reservas elegibles, la capacidad, los reintentos y la asignación entre hoteles. Las métricas acumuladas de la cola persistente describen esa política y no bastan para caracterizar por sí solas toda la discriminación de sus scores.
+
+En el universo persistente, la precisión global de 12,1108% está cerca de su prevalencia de 12,0762%. Su cociente descriptivo es 1,0029 y la diferencia es de aproximadamente 0,035 puntos porcentuales. La composición de las reservas revisadas concentra prácticamente la misma proporción de cancelaciones que el universo accesible. La igualdad aproximada se observa en este escenario de cola persistente, con este cupo acumulado y el modelo original de altas. las otras poblaciones conservan sus resultados publicados.
+
+La relación entre las métricas permite explicar el recall elevado. Si la cobertura es seguimientos / reservas accesibles, entonces recall = (precisión / prevalencia) × cobertura. Aquí la cobertura es 63,97% y el cociente precisión / prevalencia es aproximadamente uno, de modo que el recall resulta 64,16%. Una parte sustancial de la detección procede del volumen revisado. Comparar precisión y prevalencia constituye una referencia descriptiva. una política aleatoria semanal con las mismas restricciones requeriría su propia simulación para medir su rendimiento y variabilidad. El cierre actual conserva el alcance de los experimentos existentes.
+
+El reparto por hotel eleva el recall vacacional 32,13 puntos y aporta 275 TP allí. Reduce 346 TP en City Hotel y el saldo global es de 71 TP menos, el 3,80% de los 1.867 TP del cupo global. El descenso del recall urbano es de 16,85 puntos, relevante para valorar el intercambio aunque la pérdida agregada sea menor.
+
+La política global produce 13.549 falsos positivos, el 87,89% de sus seguimientos simulados. La política por hotel produce 13.620. Su coste operativo potencial comprende tiempo del equipo y posibles molestias de contactos innecesarios. Faltan duración de las llamadas, costes y valor de cada actuación para calcular rentabilidad. Los TP son cancelaciones históricas a las que se habría asignado revisión. El histórico carece de intervenciones y de sus resultados, por lo que las cancelaciones evitadas gracias a llamadas siguen sin estar medidas.
+
+### Relación con el funcionamiento operativo original
+
+| Escenario | Instante de decisión | Reservas contempladas |
+| --- | --- | --- |
+| Caso de uso original | Cada día a las 09:00, dos días antes de la llegada | Reservas realmente activas para esa llegada, con variables disponibles a esa hora |
+| Cohortes semanales evaluadas | Lunes a las 00:00 | Altas estimadas de la semana anterior que cumplen elegibilidad al cierre |
+| Cola persistente evaluada | Lunes a las 00:00 | Reservas activas reconstruidas, incluidas antiguas, con llegada entre ese lunes incluido y 28 días después excluido |
+
+Las simulaciones semanales exploran escenarios alternativos al funcionamiento original. Su reproducción y el respeto de sus reglas de calendario acreditan la coherencia interna de esos escenarios. Validar la cola diaria a las 09:00 exige observaciones del estado real y de los valores disponibles en ese instante, con una ventana diferente a la evaluada.
+
+Se necesitan identificadores estables que enlacen cada reserva y sus versiones, la fecha y hora auténticas de creación, historial de estados con fecha y hora de vigencia, instantáneas de las variables y de la llegada prevista y registros de contactos con fecha, resultado y actuación realizada. La evaluación del efecto de las llamadas necesitaría además un diseño de intervención que permita estimar su contribución. La hora ausente en el dataset impide resolver qué altas o cambios ya se conocían a las 09:00.
+
+Permanecen las limitaciones del histórico de dos hoteles portugueses de 2015–2017, las repeticiones sin ID real, la posible actualización tardía del último estado, los campos iniciales sin snapshots, el final de cobertura de llegadas en agosto de 2017 y la reutilización exploratoria de prueba. El estado final y su fecha se emplean para reconstruir elegibilidad retrospectiva y para evaluar, con exclusión explícita de los predictores. La disponibilidad real de un estado a la hora de decisión depende de los registros que faltan. El riesgo condicionado a que una reserva siga activa cerca de la llegada también puede diferir del aprendido al crearla.
+
+### Verificaciones ejecutadas para el cierre
+
+| Comprobación | Ejecución y resultado |
+| --- | --- |
+| Entrenamiento común y ausencia de contaminación de ajuste | Durante la reejecución se inspeccionaron los tres ajustes del preprocesador y de la logística. Los tres recibieron exclusivamente los mismos 48.428 índices de train y sus etiquetas. se contrastaron las medianas aprendidas y la lista de 13 entradas |
+| Restricciones temporales | Se reconstruyeron desde raw y Gold las cohortes y elegibilidad semanales y el stock activo de los 35 lunes persistentes. Las colas coinciden con las reglas declaradas. las huellas exactas de sus reservas quedan separadas de train |
+| Persistencia y ausencia de seguimientos duplicados | Se contrastó cada cola pendiente con el stock activo menos sus contactos previos. Las reservas sin contacto permanecen mientras cumplan elegibilidad y cada ID seleccionado aparece una sola vez por política |
+| Cupo y ordenación | Se recalcularon los 35 cupos nominales y comunes, el ranking y las cuotas por restos mayores. Ambas políticas realizaron exactamente el mismo número de seguimientos en cada lunes |
+| Denominadores y cifras publicadas | Se recalcularon las métricas globales y todos los segmentos de `ml_*` y `semanal_*`, y los totales y cuatro segmentos por hotel de la cola persistente. Coinciden con los informes |
+| Reproducción de los tres experimentos | Ejecución directa de las tres entradas en TMF3. Los 13 informes regenerados conservan SHA-256 idéntico. Los 35 archivos existentes al iniciar la revisión conservaban sus huellas tras las ejecuciones y antes de estas correcciones documentales |
+| Pruebas automatizadas | Las once pruebas disponibles pasan. Cubren datos y particiones, métricas, empates, tasas de train, elegibilidad, reservas futuras, persistencia y reparto de capacidad |
+| Límites y caso de uso | Se explicitan en este cierre el horario original, las aproximaciones temporales y los datos operativos pendientes |
+
+Para reproducir todos los resultados desde la raíz del proyecto con Python 3.14.5 y las dependencias fijadas, ejecutar en este orden:
+
+```powershell
+python -m pip install -r requirements.txt
+python -B -m src.machine_learning
+python -B -m src.weekly_queue
+python -B -m src.persistent_queue
+python -B -m unittest discover -s tests -v
+```
+
+Los scripts vuelven a ajustar la misma configuración sobre train y regeneran sus propios informes. La verificación se realizó en el entorno existente de Python 3.14.5, pandas 3.0.3, NumPy 2.4.6 y scikit-learn 1.9.0. La instalación desde cero queda fuera de la comprobación ejecutada. El cierre requiere exclusivamente cambios de documentación.
+
+### Conclusión para el profesor
+
+La regresión logística mejora la detección frente a la regla sencilla en la primera simulación semanal. Sin embargo, al pasar a una cola persistente de reservas activas, la precisión se aproxima a la prevalencia observada. El reparto proporcional aumenta la cobertura del hotel vacacional a costa de una pequeña pérdida de detección global y una reducción mayor del recall urbano. Estos resultados todavía no acreditan una mejora operativa suficiente para justificar un despliegue real. La comprobación del uso a las 09:00 dos días antes de la llegada requiere los datos temporales y de contactos descritos.
