@@ -1,0 +1,37 @@
+{
+  "protocolo": "cola_persistente_v1",
+  "horizonte_llegada_dias": 28,
+  "primer_lunes": "2017-01-02",
+  "ultimo_lunes": "2017-08-28",
+  "semanas": 35,
+  "train": 48428,
+  "evaluacion": {
+    "global": {
+      "n": 24097,
+      "prevalencia": 0.12076192057102544,
+      "tp": 1867,
+      "fp": 13549,
+      "fn": 1043,
+      "tn": 7638,
+      "precision": 0.12110793980280228,
+      "recall": 0.6415807560137458,
+      "fpr": 0.6394959173077831,
+      "seguimientos": 15416
+    },
+    "por_hotel": {
+      "n": 24097,
+      "prevalencia": 0.12076192057102544,
+      "tp": 1796,
+      "fp": 13620,
+      "fn": 1114,
+      "tn": 7567,
+      "precision": 0.11650233523611832,
+      "recall": 0.6171821305841925,
+      "fpr": 0.6428470288384387,
+      "seguimientos": 15416
+    }
+  },
+  "semanas_cupo_limitado": 2,
+  "sha256_gold": "2718ad6c88b52da2914b54e5f6eccb51815a2ff3c59100793c093292f900c60c",
+  "sha256_raw": "7c2ae42a7353905ea136e5c2287f17c92c5435826598bfbb8491c6f0c7b1fc06"
+}

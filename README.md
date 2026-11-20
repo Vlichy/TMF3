@@ -26,3 +26,14 @@ python -B -m unittest discover -s tests -v
 
 Se generan cinco archivos `reports/semanal_*` con tasas de entrenamiento, elegibilidad, predicciones, métricas y resultados por semana y hotel. La evaluación adicional es retrospectiva y reutiliza el conjunto de prueba ya examinado.
 
+
+## Cola persistente y capacidad por hotel
+
+La segunda ampliación incorpora reservas activas de semanas anteriores, evita repetir seguimientos y compara el ranking global con cuotas proporcionales por hotel. La ventana de trabajo abarca llegadas previstas en los próximos 28 días. El mismo número de seguimientos se conserva en cada lunes de ambas políticas.
+
+```powershell
+python -B -m src.persistent_queue
+python -B -m unittest discover -s tests -v
+```
+
+El script genera cuatro archivos `reports/cola_persistente_*`. La memoria documenta el intercambio entre cobertura del hotel vacacional y detección global, junto con las limitaciones del modelo al puntuar reservas que siguen activas.

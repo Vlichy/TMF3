@@ -1,6 +1,6 @@
 # Entrega 03 · Machine Learning
 
-La ampliación semanal del 21/11/2026, al final de este documento, responde al feedback del profesor y actualiza la decisión para el MVP. Los cinco apartados iniciales conservan el experimento mensual original.
+Las ampliaciones al final de este documento responden al feedback del profesor. La sección final de cola persistente recoge la evaluación más reciente y sus límites para el MVP. Los cinco apartados iniciales conservan el experimento mensual original.
 
 ## 1. Qué problema resuelve el modelo
 
@@ -155,6 +155,83 @@ Para reproducir la ampliación desde la raíz:
 
 ```powershell
 python -B -m src.weekly_queue
+python -B -m unittest discover -s tests -v
+```
+
+
+## Ampliación pequeña · Reservas activas, persistencia y reparto por hotel
+
+Esta ampliación contrasta las tres comprobaciones solicitadas usando el mismo entrenamiento y la misma configuración logística. El [script](../../src/persistent_queue.py) reconstruye una cola persistente para 35 lunes, del 02/01/2017 al 28/08/2017. El modelo se vuelve a ajustar únicamente con las 48.428 filas de entrenamiento originales, con etiquetas maduras antes de julio de 2016, para puntuar también las reservas antiguas que faltaban en los informes anteriores. Se verifica que ninguna reserva de entrenamiento entre activa en evaluación. El test ya se había consultado, de modo que se trata de una extensión exploratoria.
+
+### 1. Reservas activas de cualquier semana y ausencia de seguimientos duplicados
+
+Se reconstruye la situación de cada lunes a las 00:00. Una reserva entra si su alta estimada es anterior al lunes, su llegada está entre ese lunes incluido y 28 días después excluido, y su fecha de estado final es ese lunes o posterior. Las altas del propio lunes se incorporan en la siguiente decisión. Los estados fechados ese lunes se tratan como desconocidos a las 00:00 porque la fuente carece de hora.
+
+La ventana de 28 días es una decisión de diseño explícita para delimitar el trabajo antes de la llegada. Permite incluir reservas creadas semanas o meses antes. Se identifican 24.097 reservas distintas con al menos una oportunidad de revisión, de las que 7.654 tienen alta estimada anterior a enero de 2017.
+
+Cada política conserva su propio registro de IDs ya seleccionados. Una reserva seguida sale definitivamente de esa cola. Las restantes vuelven a competir cada lunes mientras sigan activas y dentro de la ventana. Por tanto, repetir la aparición de un ID entre eventos refleja espera en la cola. Los seguimientos seleccionados son únicos dentro de cada política. Al carecer de ID real, la garantía de unicidad se limita a la fila técnica del dataset. Dos filas que representaran la misma reserva real seguirían siendo indistinguibles de dos reservas legítimas.
+
+### 2. Momento de decisión y horizonte operativo
+
+| Aspecto | Simulación semanal anterior | Cola persistente nueva |
+| --- | --- | --- |
+| Universo del lunes | Solo altas de la semana inmediatamente anterior | Todas las reservas activas disponibles, de cualquier fecha de alta, con llegada en los próximos 28 días |
+| Reserva sin prioridad | Sale de su único lote | Puede volver en lunes posteriores |
+| Reservas ya seguidas | Una sola oportunidad por construcción | Registro persistente de seguimientos por política |
+| Inicio de evaluación | Primer lote completo con cierre el 09/01/2017 | Apertura de cola con backlog el 02/01/2017 |
+| Variables del modelo | Datos originales de la reserva | Los mismos datos originales, incluidos los días de antelación al crearla |
+| Cupo | 20% de nuevas altas elegibles de esa semana | 20% del stock activo del lunes, con capacidad común realizable |
+
+Se mantiene fija la antelación original del Gold. Los días hasta llegada calculados desde el lunes delimitan la ventana operativa y no sustituyen una variable del modelo entrenado al crear la reserva. El objetivo evaluado sigue siendo el desenlace final de cancelación de esa reserva. La ventana de 28 días define qué reservas se pueden revisar antes de su llegada. El modelo carece de una estimación específica de cancelación durante los siete días siguientes o condicionada a seguir activa el lunes.
+
+La disponibilidad se aproxima con el último estado fechado del histórico. La fuente carece de snapshots y de un historial completo de estados, por lo que la actividad real y sus valores iniciales requieren confirmación con datos operativos. Una actualización final tardía podría incluir una reserva cuyo desenlace ya se conocía. El horizonte de llegadas del fichero hasta agosto de 2017 reduce la cobertura al final del análisis. Estas limitaciones impiden certificar una reproducción exacta de la operación.
+
+### 3. Cupo global frente a reparto por hotel con el mismo trabajo
+
+Se fija primero el cupo nominal como floor(0,20 × reservas activas del lunes), antes de quitar las ya seguidas. Para mantener exactamente el mismo trabajo realizado, el cupo común se limita al mínimo de ese cupo nominal y las reservas pendientes de cada política. Todas las cantidades se conocen en el lunes evaluado. Este límite común compara las dos trayectorias simuladas y se exporta de forma explícita. En un piloto habría que fijar la capacidad disponible con el equipo.
+
+- **Global.** Selecciona el mayor score entre los pendientes de ambos hoteles.
+- **Por hotel.** Distribuye el cupo común proporcionalmente al número de pendientes de cada hotel. Redondea mediante restos mayores, con desempate por nombre del hotel, y selecciona los scores más altos dentro de cada cuota.
+
+El modelo, los scores, los desempates y las reservas activas de partida coinciden entre políticas. Las reservas pendientes evolucionan de forma distinta debido a los seguimientos anteriores. En las dos últimas semanas se reduce el cupo común por agotamiento de reservas pendientes, de 196 a 67 y de 70 a 26. El nominal acumulado es 15.589 y el trabajo común realizado suma 15.416 seguimientos. Los cupos realizados coinciden en cada uno de los 35 lunes.
+
+Como una reserva no elegida puede volver a competir, el 20% semanal termina cubriendo el 63,97% de los 24.097 IDs accesibles durante todo el periodo. Los recall siguientes usan ese universo común de IDs únicos y su desenlace final. Se contabiliza cada reserva una sola vez, con independencia de las semanas que haya esperado.
+
+| Resultado global | Cupo global | Reparto por hotel |
+| --- | ---: | ---: |
+| Reservas accesibles distintas | 24.097 | 24.097 |
+| Seguimientos únicos | 15.416 | 15.416 |
+| Cancelaciones detectadas (TP) | 1.867 | 1.796 |
+| Seguimientos a reservas que no cancelan (FP) | 13.549 | 13.620 |
+| Cancelaciones sin seguimiento (FN) | 1.043 | 1.114 |
+| Precisión | 12,11% | 11,65% |
+| Recall | 64,16% | 61,72% |
+
+| Hotel | Política | Seguimientos | TP | FN | Precisión | Recall |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| City Hotel | Global | 12.396 | 1.599 | 455 | 12,90% | 77,85% |
+| City Hotel | Por hotel | 10.348 | 1.253 | 801 | 12,11% | 61,00% |
+| Resort Hotel | Global | 3.020 | 268 | 588 | 8,87% | 31,31% |
+| Resort Hotel | Por hotel | 5.068 | 543 | 313 | 10,71% | 63,43% |
+
+El reparto por hotel añade 2.048 seguimientos y 275 TP en Resort Hotel. Su recall sube 32,13 puntos. City Hotel pierde 346 TP y 16,85 puntos de recall. El balance global es de 71 TP menos, una reducción relativa del 3,80%, con 0,46 puntos menos de precisión y 2,44 puntos menos de recall. Se mejora claramente la cobertura vacacional con una pérdida global cuantificada. La aceptabilidad depende del valor que el producto asigne a esa cobertura y a las cancelaciones omitidas en el urbano.
+
+La prevalencia de cancelación entre las reservas accesibles es 12,08%, muy próxima a la precisión global de 12,11%. Esto limita el valor de usar el ranking original de altas entre reservas que han sobrevivido activas hasta cerca de su llegada. La redistribución mejora cobertura, pero esta evidencia no acredita utilidad suficiente del modelo para una cola operativa. Las poblaciones, los horizontes, la capacidad acumulada y las oportunidades repetidas difieren de la simulación anterior. La comparación directa entre sus métricas confundiría esos cambios.
+
+### Evidencias y verificación de las tres comprobaciones
+
+| Comprobación | Evidencia |
+| --- | --- |
+| Backlog activo de semanas anteriores y seguimiento único | [Eventos por reserva, lunes y política](../../reports/cola_persistente_eventos.csv), con prueba de persistencia y ausencia de contactos repetidos |
+| Momento y horizonte coherentes | Fechas explícitas por evento, límites de lunes y ventana de llegada verificados en [pruebas](../../tests/test_persistent_queue.py) |
+| Igual número total de seguimientos y cobertura por hotel | [Cupos por lunes](../../reports/cola_persistente_cupos.csv), [resultados globales](../../reports/cola_persistente_metricas.json) y [resultados por hotel](../../reports/cola_persistente_hoteles.csv) |
+
+Se ejecutaron once pruebas, incluyendo las siete existentes. Las cuatro nuevas comprueban persistencia y exclusión de IDs seguidos, fechas límite y ausencia de efecto de altas futuras, asignación exacta de cuotas y recálculo de las evidencias reales. La extensión genera cuatro archivos de resultados independientes y conserva las evidencias de los experimentos anteriores.
+
+Para reproducir esta ampliación:
+
+```powershell
+python -B -m src.persistent_queue
 python -B -m unittest discover -s tests -v
 ```
 
