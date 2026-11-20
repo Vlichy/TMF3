@@ -1,5 +1,7 @@
 # Entrega 03 · Machine Learning
 
+La ampliación semanal del 21/11/2026, al final de este documento, responde al feedback del profesor y actualiza la decisión para el MVP. Los cinco apartados iniciales conservan el experimento mensual original.
+
 ## 1. Qué problema resuelve el modelo
 
 El equipo de reservas necesita decidir qué reservas revisar primero cuando no puede revisar todas. El modelo aborda una clasificación binaria supervisada y ordena reservas por riesgo de cancelación. El equipo puede comprobar datos o decidir si procede un contacto de seguimiento. La decisión queda en manos del equipo. El experimento mide detección de cancelaciones históricas y carece de datos de intervención para estimar cuántas se evitarían.
@@ -78,4 +80,81 @@ python -B -m unittest discover -s tests -v
 | 5. Selección, mejora, suficiencia y salida del frontal | Apartado 5 |
 | Documento en la ruta obligatoria y código reproducible | Este documento y [script](../../src/machine_learning.py) |
 | Comprobaciones ejecutables | [Pruebas](../../tests/test_machine_learning.py) de integridad del Gold, separación temporal, empates, cupo, predicciones y métricas |
+
+
+## Ampliación · Cola semanal solicitada por el profesor
+
+Experimento adicional ejecutado el 21/11/2026 mediante [src/weekly_queue.py](../../src/weekly_queue.py). El conjunto de prueba ya había sido consultado en la entrega original. Esta ampliación constituye un análisis retrospectivo exploratorio. Se fija el protocolo, sin optimizar sus parámetros con estos resultados.
+
+### Momento de decisión y reservas disponibles
+
+Cada lunes a las 00:00 se revisan las altas estimadas del intervalo lunes anterior incluido a lunes actual excluido. Se admite una reserva si su llegada prevista es ese lunes o posterior y su estado final no consta fechado antes del cierre. Una fecha de estado del propio lunes se considera aún desconocida por la falta de hora. La fecha del estado solo permite reconstruir la elegibilidad y queda fuera de los predictores y del ranking. Es necesario disponer en operación del estado vigente y de una instantánea real de la reserva.
+
+Se ordenan exclusivamente las reservas elegibles de esa semana. El cupo es floor(n_elegibles / 5), común para los dos hoteles. Los empates usan la misma huella reproducible de la entrega. Las reservas sin prioridad salen de este lote y no se vuelven a revisar. Cada reserva tiene una única oportunidad de seguimiento, con espera de hasta siete días. El cupo se calcula al cerrar la semana, cuando su volumen ya es conocido. Representa una capacidad proporcional hipotética y tendría que contrastarse con horas de trabajo reales. Las reservas que se resuelven o llegan antes del cierre quedan fuera del alcance de esta cadencia.
+
+Se reutiliza el entrenamiento original de 48.428 filas con etiquetas maduras antes del 01/07/2016. El modelo y las tasas se mantienen fijos en todas las semanas, sin realimentación de validación o prueba. Para evaluar validación se recuperan también las altas que la entrega mensual purgaba por tener desenlace posterior al 01/01/2017. Al mantener fijo el modelo, sus resultados futuros se pueden medir retrospectivamente sin usarlos para entrenar. Así se evita seleccionar las reservas semanales de validación por el momento en que terminaron cancelándose.
+
+Se incluyen semanas completas dentro de cada bloque. Los cierres de validación abarcan del 11/07/2016 al 26/12/2016 y los de prueba del 09/01/2017 al 28/08/2017. Las semanas que cruzan un corte y el último fragmento de agosto quedan fuera. El Gold solo cubre llegadas hasta agosto de 2017, lo que limita la representatividad de las últimas semanas.
+
+| Bloque | Semanas | Altas de las cohortes | Elegibles al cierre | Excluidas antes de ordenar | Cupo total |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Validación | 25 | 25.663 | 19.646 | 6.017 | 3.920 |
+| Prueba | 34 | 26.427 | 18.929 | 7.498 | 3.771 |
+
+En prueba, 3.952 reservas ya habían llegado y 6.570 tenían desenlace conocido antes del cierre. Ambos motivos se solapan y su unión da las 7.498 exclusiones. La prevalencia de cancelación entre las reservas elegibles de prueba es 23,85%. Estas poblaciones y oportunidades de seguimiento difieren de las del experimento mensual, por lo que sus métricas no permiten aislar causalmente el efecto de cambiar de cadencia.
+
+### Regla sencilla y comparación
+
+La nueva regla utiliza seis celdas, combinando hotel con los tramos de antelación 0–7, 8–30 y 31 o más días, fijados antes de ejecutar. Su score es (cancelaciones_celda + 20 × tasa_global_train) / (reservas_celda + 20). El suavizado reduce la inestabilidad de celdas pequeñas. Una combinación desconocida recibe la tasa global. Las tasas y sus recuentos se guardan en [semanal_tasas_train.csv](../../reports/semanal_tasas_train.csv).
+
+Se comparan tres enfoques con exactamente las mismas reservas y el mismo cupo semanal. Se conserva el baseline global con desempate por hash para distinguir el valor de la regla sencilla y el de la logística.
+
+| Bloque | Enfoque | Precisión | Recall | TP | FP | FN | AP | ROC-AUC | Brier ↓ |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Validación | Baseline global | 30,66% | 19,97% | 1.202 | 2.718 | 4.818 | 0,3064 | 0,5000 | 0,2152 |
+| Validación | Hotel y antelación | 38,57% | 25,12% | 1.512 | 2.408 | 4.508 | 0,3757 | 0,6257 | 0,2127 |
+| Validación | Logística | 55,08% | 35,86% | 2.159 | 1.761 | 3.861 | 0,5198 | 0,6939 | 0,2034 |
+| Prueba | Baseline global | 23,60% | 19,71% | 890 | 2.881 | 3.625 | 0,2385 | 0,5000 | 0,1959 |
+| Prueba | Hotel y antelación | 28,48% | 23,79% | 1.074 | 2.697 | 3.441 | 0,2845 | 0,6025 | 0,2040 |
+| Prueba | Logística | 35,06% | 29,28% | 1.322 | 2.449 | 3.193 | 0,3273 | 0,6264 | 0,1996 |
+
+La logística localiza 248 cancelaciones adicionales frente a la regla por hotel y antelación, con 6,58 puntos más de precisión y 5,49 puntos más de recall. Supera a esa regla en TP en 24 de las 34 semanas de prueba, empata en 3 y queda por debajo en 7. Su Brier empeora frente al baseline global en prueba, aunque mejora la priorización. Los scores requieren validación de calibración antes de interpretarlos como probabilidades.
+
+### Qué ocurre en el hotel vacacional
+
+El cupo conjunto permite que cada enfoque distribuya el trabajo entre hoteles según su ranking.
+
+| Hotel en prueba | Enfoque | Elegibles | Alertas | TP | FP | FN | Precisión | Recall |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| City Hotel | Baseline global | 12.816 | 2.567 | 620 | 1.947 | 2.490 | 24,15% | 19,94% |
+| City Hotel | Hotel y antelación | 12.816 | 3.727 | 1.061 | 2.666 | 2.049 | 28,47% | 34,12% |
+| City Hotel | Logística | 12.816 | 3.386 | 1.136 | 2.250 | 1.974 | 33,55% | 36,53% |
+| Resort Hotel | Baseline global | 6.113 | 1.204 | 270 | 934 | 1.135 | 22,43% | 19,22% |
+| Resort Hotel | Hotel y antelación | 6.113 | 44 | 13 | 31 | 1.392 | 29,55% | 0,93% |
+| Resort Hotel | Logística | 6.113 | 385 | 186 | 199 | 1.219 | 48,31% | 13,24% |
+
+En Resort Hotel la logística mejora frente a la regla sencilla, con 173 TP adicionales. La regla concede casi todo el cupo al hotel urbano porque su celda City Hotel con 31 o más días tiene una tasa de entrenamiento del 52,29%, frente al 35,33% de la celda análoga vacacional. La logística concede más alertas al vacacional, pero su recall sigue por debajo del baseline global. En validación el recall vacacional de la logística era 27,14%, frente al 13,24% de prueba, mostrando variación temporal relevante.
+
+### Decisión actualizada y límites
+
+La evidencia semanal mantiene la elección de la logística para explorar una cola supervisada orientada a detectar cancelaciones con capacidad limitada. La política global pierde cobertura en el hotel vacacional frente al seguimiento sin información individual. Si el producto debe garantizar cobertura en ambos hoteles, hace falta evaluar explícitamente una asignación de capacidad por hotel antes de decidir su uso operativo. La regla por hotel y antelación resulta insuficiente para corregir esa concentración.
+
+La simulación reduce el uso de información de reservas futuras al ordenar, pero siguen pendientes la fecha real de alta, los snapshots iniciales y el historial de estados. El último estado fechado aproxima cuándo se conoció un desenlace y podría reflejar una actualización tardía. La espera semanal excluye cancelaciones rápidas y reservas de llegada inmediata. Las métricas describen cancelaciones detectables entre los elegibles al cierre, con efectos de contacto y rentabilidad aún sin medir.
+
+### Evidencias y comprobaciones
+
+- [Métricas globales y tamaños](../../reports/semanal_metricas.json).
+- [Altas y elegibilidad de cada reserva](../../reports/semanal_elegibilidad.csv).
+- [Scores y prioridades de los tres enfoques](../../reports/semanal_predicciones.csv).
+- [Resultados por semana y hotel](../../reports/semanal_segmentos.csv).
+- [Pruebas de la cola semanal](../../tests/test_weekly_queue.py).
+
+Se ejecutaron siete pruebas en total, incluyendo las tres anteriores. Las cuatro nuevas comprueban que añadir reservas futuras conserve decisiones previas, los límites del lunes y los desenlaces conocidos, las tasas ajustadas con train y el fallback de grupos desconocidos, y la elegibilidad, el cupo y las métricas sobre las evidencias reales.
+
+Para reproducir la ampliación desde la raíz:
+
+```powershell
+python -B -m src.weekly_queue
+python -B -m unittest discover -s tests -v
+```
 

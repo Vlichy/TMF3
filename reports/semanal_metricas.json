@@ -1,0 +1,120 @@
+{
+  "protocolo": "semanal_v1",
+  "cupo": "floor(0.20 * elegibles de la semana)",
+  "suavizado_regla": 20,
+  "train": 48428,
+  "sha256_gold": "2718ad6c88b52da2914b54e5f6eccb51815a2ff3c59100793c093292f900c60c",
+  "sha256_raw": "7c2ae42a7353905ea136e5c2287f17c92c5435826598bfbb8491c6f0c7b1fc06",
+  "evaluacion": {
+    "prueba": {
+      "altas_cohorte": 26427,
+      "elegibles": 18929,
+      "excluidas": 7498,
+      "llegada_pasada": 3952,
+      "desenlace_conocido": 6570,
+      "semanas": 34,
+      "modelos": {
+        "baseline": {
+          "n": 18929,
+          "prevalencia": 0.2385229013682709,
+          "tp": 890,
+          "fp": 2881,
+          "fn": 3625,
+          "tn": 11533,
+          "precision": 0.23601166799257492,
+          "recall": 0.19712070874861573,
+          "fpr": 0.19987512140974054,
+          "alertas": 3771,
+          "ap": 0.2385229013682709,
+          "roc_auc": 0.5,
+          "brier": 0.19591820465717033
+        },
+        "regla_hotel_antelacion": {
+          "n": 18929,
+          "prevalencia": 0.2385229013682709,
+          "tp": 1074,
+          "fp": 2697,
+          "fn": 3441,
+          "tn": 11717,
+          "precision": 0.284805091487669,
+          "recall": 0.2378737541528239,
+          "fpr": 0.18710975440543914,
+          "alertas": 3771,
+          "ap": 0.28450811524531294,
+          "roc_auc": 0.602535640798344,
+          "brier": 0.20403043385075595
+        },
+        "logistica": {
+          "n": 18929,
+          "prevalencia": 0.2385229013682709,
+          "tp": 1322,
+          "fp": 2449,
+          "fn": 3193,
+          "tn": 11965,
+          "precision": 0.3505701405462742,
+          "recall": 0.29280177187153933,
+          "fpr": 0.16990425974746773,
+          "alertas": 3771,
+          "ap": 0.32729234868302814,
+          "roc_auc": 0.6264324505475711,
+          "brier": 0.19959375301655718
+        }
+      }
+    },
+    "validacion": {
+      "altas_cohorte": 25663,
+      "elegibles": 19646,
+      "excluidas": 6017,
+      "llegada_pasada": 2578,
+      "desenlace_conocido": 5429,
+      "semanas": 25,
+      "modelos": {
+        "baseline": {
+          "n": 19646,
+          "prevalencia": 0.30642369948081033,
+          "tp": 1202,
+          "fp": 2718,
+          "fn": 4818,
+          "tn": 10908,
+          "precision": 0.3066326530612245,
+          "recall": 0.19966777408637873,
+          "fpr": 0.19947159841479525,
+          "alertas": 3920,
+          "ap": 0.30642369948081033,
+          "roc_auc": 0.5,
+          "brier": 0.21519424687347477
+        },
+        "regla_hotel_antelacion": {
+          "n": 19646,
+          "prevalencia": 0.30642369948081033,
+          "tp": 1512,
+          "fp": 2408,
+          "fn": 4508,
+          "tn": 11218,
+          "precision": 0.38571428571428573,
+          "recall": 0.25116279069767444,
+          "fpr": 0.17672097460736827,
+          "alertas": 3920,
+          "ap": 0.375685829312828,
+          "roc_auc": 0.6256592341297881,
+          "brier": 0.21271912447516897
+        },
+        "logistica": {
+          "n": 19646,
+          "prevalencia": 0.30642369948081033,
+          "tp": 2159,
+          "fp": 1761,
+          "fn": 3861,
+          "tn": 11865,
+          "precision": 0.550765306122449,
+          "recall": 0.35863787375415285,
+          "fpr": 0.12923822104799648,
+          "alertas": 3920,
+          "ap": 0.519796071614774,
+          "roc_auc": 0.6939444963776014,
+          "brier": 0.2034355418241552
+        }
+      }
+    }
+  }
+}
