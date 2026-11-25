@@ -1,0 +1,145 @@
+<div id="tmf3-lunes-demo">
+  <div class="demo-heading">
+    <h2>Lunes 2 de enero de 2017</h2>
+    <div class="text-muted">00:00 · Llegadas del 2 al 29 de enero · 1.152 reservas pendientes</div>
+  </div>
+  <div class="demo-controls">
+    <div class="viz-controls" role="group" aria-label="Reparto de llamadas">
+      <button class="btn" type="button" data-policy="global" aria-pressed="true">Cupo global</button>
+      <button class="btn" type="button" data-policy="por_hotel" aria-pressed="false">Reparto por hotel</button>
+    </div>
+    <label class="form-check">
+      <input class="form-check-input" type="checkbox" id="tmf3-historical">
+      <span class="form-check-label">Mostrar desenlace histórico</span>
+    </label>
+  </div>
+  <div class="table-responsive" aria-live="polite" aria-atomic="true">
+    <table class="table tabular-nums" aria-label="Asignación de las mismas 230 llamadas entre hoteles">
+      <thead><tr><th scope="col">Hotel</th><th scope="col" class="text-end">Llamadas</th><th scope="col" class="text-end" data-historical hidden>Cancelaciones</th><th scope="col" class="text-end" data-historical hidden aria-label="Cambio de cancelaciones detectadas frente al cupo global" data-tooltip="Cambio de cancelaciones detectadas frente al cupo global">Δ</th></tr></thead>
+      <tbody id="tmf3-allocation"></tbody>
+      <tfoot id="tmf3-total"></tfoot>
+    </table>
+  </div>
+  <div class="demo-group">
+    <h3>Llamadas que cambian</h3>
+    <div class="text-muted" id="tmf3-list-context"></div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-sm tabular-nums" aria-label="Reservas que aparecen exclusivamente en la política seleccionada">
+      <thead><tr><th scope="col">ID de fila</th><th scope="col">Hotel</th><th scope="col">Llegada</th><th scope="col" class="text-end" data-tooltip="Puntuación con los campos originales de la reserva. Su calibración como probabilidad no está acreditada.">Score inicial</th><th scope="col" data-historical hidden>Desenlace posterior</th></tr></thead>
+      <tbody id="tmf3-call-list"></tbody>
+    </table>
+  </div>
+  <div class="viz-row demo-pagination">
+    <div class="text-small text-muted" id="tmf3-page-label" aria-live="polite"></div>
+    <div class="viz-controls">
+      <button type="button" class="btn" id="tmf3-previous" aria-label="Página anterior de reservas">Anterior</button>
+      <button type="button" class="btn" id="tmf3-next" aria-label="Página siguiente de reservas">Siguiente</button>
+    </div>
+  </div>
+  <div class="text-small text-muted">230 llamadas por política · 164 reservas comunes · 66 sustituciones</div>
+</div>
+<style>
+  #tmf3-lunes-demo { display: flex; flex-direction: column; gap: calc(var(--font-size-base) * 1); color: var(--foreground); }
+  #tmf3-lunes-demo .demo-heading { display: flex; flex-direction: column; gap: calc(var(--font-size-base) * .5); padding-right: calc(var(--font-size-base) * 6); }
+  #tmf3-lunes-demo .demo-controls { display: flex; flex-direction: column; gap: calc(var(--font-size-base) * .75); }
+  #tmf3-lunes-demo .demo-group { display: flex; flex-direction: column; gap: calc(var(--font-size-base) * .25); }
+  #tmf3-lunes-demo .demo-pagination { justify-content: space-between; }
+  #tmf3-lunes-demo tfoot { font-weight: 500; }
+  #tmf3-lunes-demo [hidden] { display: none !important; }
+  @media (max-width: 450px) {
+    #tmf3-lunes-demo .demo-heading { padding-right: 0; }
+  }
+</style>
+<script type="application/json" id="tmf3-demo-data">{"date": "2017-01-02", "capacity": 230, "available": 1152, "common": 164, "sourceSha256": "6bbb927e61af8625212300c83d3ad66fb5ebee68b3d3ca4f510a8a2ccea591e9", "policies": {"global": {"totals": [{"hotel": "Urbano", "calls": 215, "tp": 20, "available": 747}, {"hotel": "Vacacional", "calls": 15, "tp": 0, "available": 405}], "tp": 20, "movers": [{"id": 62280, "hotel": "Urbano", "arrival": "2017-01-07", "score": 0.434832, "canceled": 1}, {"id": 103966, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.43455, "canceled": 0}, {"id": 104166, "hotel": "Urbano", "arrival": "2017-01-04", "score": 0.434033, "canceled": 0}, {"id": 105063, "hotel": "Urbano", "arrival": "2017-01-27", "score": 0.433874, "canceled": 0}, {"id": 104856, "hotel": "Urbano", "arrival": "2017-01-21", "score": 0.433361, "canceled": 0}, {"id": 62335, "hotel": "Urbano", "arrival": "2017-01-09", "score": 0.431945, "canceled": 1}, {"id": 104108, "hotel": "Urbano", "arrival": "2017-01-03", "score": 0.431945, "canceled": 0}, {"id": 104133, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.431433, "canceled": 0}, {"id": 105209, "hotel": "Urbano", "arrival": "2017-01-28", "score": 0.431355, "canceled": 0}, {"id": 105210, "hotel": "Urbano", "arrival": "2017-01-28", "score": 0.431355, "canceled": 0}, {"id": 104188, "hotel": "Urbano", "arrival": "2017-01-04", "score": 0.431196, "canceled": 0}, {"id": 104248, "hotel": "Urbano", "arrival": "2017-01-06", "score": 0.42986, "canceled": 0}, {"id": 104180, "hotel": "Urbano", "arrival": "2017-01-04", "score": 0.428479, "canceled": 0}, {"id": 104815, "hotel": "Urbano", "arrival": "2017-01-15", "score": 0.428224, "canceled": 0}, {"id": 104348, "hotel": "Urbano", "arrival": "2017-01-09", "score": 0.427963, "canceled": 0}, {"id": 62126, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.427871, "canceled": 1}, {"id": 104094, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.427871, "canceled": 0}, {"id": 62135, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.427871, "canceled": 1}, {"id": 104093, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.427871, "canceled": 0}, {"id": 62121, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.427871, "canceled": 1}, {"id": 104097, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.427871, "canceled": 0}, {"id": 104515, "hotel": "Urbano", "arrival": "2017-01-12", "score": 0.426528, "canceled": 0}, {"id": 105125, "hotel": "Urbano", "arrival": "2017-01-27", "score": 0.426507, "canceled": 0}, {"id": 104107, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.425856, "canceled": 0}, {"id": 104146, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.425856, "canceled": 0}, {"id": 104151, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.424745, "canceled": 0}, {"id": 104931, "hotel": "Urbano", "arrival": "2017-01-21", "score": 0.423518, "canceled": 0}, {"id": 104562, "hotel": "Urbano", "arrival": "2017-01-16", "score": 0.423303, "canceled": 0}, {"id": 105028, "hotel": "Urbano", "arrival": "2017-01-25", "score": 0.421545, "canceled": 0}, {"id": 105237, "hotel": "Urbano", "arrival": "2017-01-25", "score": 0.420419, "canceled": 0}, {"id": 104242, "hotel": "Urbano", "arrival": "2017-01-06", "score": 0.4203, "canceled": 0}, {"id": 105029, "hotel": "Urbano", "arrival": "2017-01-25", "score": 0.420279, "canceled": 0}, {"id": 104158, "hotel": "Urbano", "arrival": "2017-01-04", "score": 0.420225, "canceled": 0}, {"id": 104241, "hotel": "Urbano", "arrival": "2017-01-05", "score": 0.419193, "canceled": 0}, {"id": 104233, "hotel": "Urbano", "arrival": "2017-01-08", "score": 0.418491, "canceled": 0}, {"id": 104047, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.41823, "canceled": 0}, {"id": 104426, "hotel": "Urbano", "arrival": "2017-01-09", "score": 0.417718, "canceled": 0}, {"id": 104994, "hotel": "Urbano", "arrival": "2017-01-23", "score": 0.417561, "canceled": 0}, {"id": 104769, "hotel": "Urbano", "arrival": "2017-01-20", "score": 0.417246, "canceled": 0}, {"id": 105006, "hotel": "Urbano", "arrival": "2017-01-25", "score": 0.415984, "canceled": 0}, {"id": 104316, "hotel": "Urbano", "arrival": "2017-01-08", "score": 0.413273, "canceled": 0}, {"id": 62736, "hotel": "Urbano", "arrival": "2017-01-20", "score": 0.413273, "canceled": 1}, {"id": 104129, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.412172, "canceled": 0}, {"id": 104127, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.412172, "canceled": 0}, {"id": 105064, "hotel": "Urbano", "arrival": "2017-01-22", "score": 0.41184, "canceled": 0}, {"id": 104855, "hotel": "Urbano", "arrival": "2017-01-18", "score": 0.411684, "canceled": 0}, {"id": 105124, "hotel": "Urbano", "arrival": "2017-01-27", "score": 0.411213, "canceled": 0}, {"id": 62540, "hotel": "Urbano", "arrival": "2017-01-14", "score": 0.411056, "canceled": 1}, {"id": 63047, "hotel": "Urbano", "arrival": "2017-01-27", "score": 0.411056, "canceled": 1}, {"id": 104486, "hotel": "Urbano", "arrival": "2017-01-14", "score": 0.410899, "canceled": 0}, {"id": 105187, "hotel": "Urbano", "arrival": "2017-01-26", "score": 0.410583, "canceled": 0}, {"id": 104842, "hotel": "Urbano", "arrival": "2017-01-19", "score": 0.410006, "canceled": 0}, {"id": 104208, "hotel": "Urbano", "arrival": "2017-01-05", "score": 0.409956, "canceled": 0}, {"id": 105087, "hotel": "Urbano", "arrival": "2017-01-27", "score": 0.409891, "canceled": 0}, {"id": 105086, "hotel": "Urbano", "arrival": "2017-01-27", "score": 0.409891, "canceled": 0}, {"id": 105072, "hotel": "Urbano", "arrival": "2017-01-27", "score": 0.409891, "canceled": 0}, {"id": 104843, "hotel": "Urbano", "arrival": "2017-01-16", "score": 0.409782, "canceled": 0}, {"id": 104353, "hotel": "Urbano", "arrival": "2017-01-09", "score": 0.409753, "canceled": 0}, {"id": 104355, "hotel": "Urbano", "arrival": "2017-01-09", "score": 0.409753, "canceled": 0}, {"id": 104340, "hotel": "Urbano", "arrival": "2017-01-09", "score": 0.409753, "canceled": 0}, {"id": 104344, "hotel": "Urbano", "arrival": "2017-01-09", "score": 0.409753, "canceled": 0}, {"id": 104364, "hotel": "Urbano", "arrival": "2017-01-09", "score": 0.409753, "canceled": 0}, {"id": 104857, "hotel": "Urbano", "arrival": "2017-01-18", "score": 0.409626, "canceled": 0}, {"id": 104121, "hotel": "Urbano", "arrival": "2017-01-02", "score": 0.408078, "canceled": 0}, {"id": 104414, "hotel": "Urbano", "arrival": "2017-01-08", "score": 0.407414, "canceled": 0}, {"id": 62305, "hotel": "Urbano", "arrival": "2017-01-08", "score": 0.406668, "canceled": 1}]}, "por_hotel": {"totals": [{"hotel": "Urbano", "calls": 149, "tp": 11, "available": 747}, {"hotel": "Vacacional", "calls": 81, "tp": 5, "available": 405}], "tp": 16, "movers": [{"id": 32086, "hotel": "Vacacional", "arrival": "2017-01-09", "score": 0.386466, "canceled": 0}, {"id": 32087, "hotel": "Vacacional", "arrival": "2017-01-09", "score": 0.386466, "canceled": 0}, {"id": 31915, "hotel": "Vacacional", "arrival": "2017-01-03", "score": 0.384643, "canceled": 0}, {"id": 31762, "hotel": "Vacacional", "arrival": "2017-01-05", "score": 0.373531, "canceled": 0}, {"id": 32100, "hotel": "Vacacional", "arrival": "2017-01-12", "score": 0.372922, "canceled": 0}, {"id": 31813, "hotel": "Vacacional", "arrival": "2017-01-02", "score": 0.372057, "canceled": 0}, {"id": 32946, "hotel": "Vacacional", "arrival": "2017-01-06", "score": 0.371736, "canceled": 0}, {"id": 32242, "hotel": "Vacacional", "arrival": "2017-01-16", "score": 0.370581, "canceled": 0}, {"id": 32241, "hotel": "Vacacional", "arrival": "2017-01-16", "score": 0.370581, "canceled": 0}, {"id": 32247, "hotel": "Vacacional", "arrival": "2017-01-16", "score": 0.370581, "canceled": 0}, {"id": 32157, "hotel": "Vacacional", "arrival": "2017-01-12", "score": 0.369253, "canceled": 0}, {"id": 31825, "hotel": "Vacacional", "arrival": "2017-01-05", "score": 0.367553, "canceled": 0}, {"id": 32331, "hotel": "Vacacional", "arrival": "2017-01-19", "score": 0.366722, "canceled": 0}, {"id": 32667, "hotel": "Vacacional", "arrival": "2017-01-28", "score": 0.365199, "canceled": 0}, {"id": 32623, "hotel": "Vacacional", "arrival": "2017-01-24", "score": 0.361714, "canceled": 0}, {"id": 32789, "hotel": "Vacacional", "arrival": "2017-01-29", "score": 0.360493, "canceled": 0}, {"id": 32719, "hotel": "Vacacional", "arrival": "2017-01-26", "score": 0.358684, "canceled": 0}, {"id": 32075, "hotel": "Vacacional", "arrival": "2017-01-14", "score": 0.350124, "canceled": 0}, {"id": 32333, "hotel": "Vacacional", "arrival": "2017-01-19", "score": 0.345669, "canceled": 0}, {"id": 31755, "hotel": "Vacacional", "arrival": "2017-01-02", "score": 0.341523, "canceled": 0}, {"id": 32917, "hotel": "Vacacional", "arrival": "2017-01-26", "score": 0.333821, "canceled": 0}, {"id": 32753, "hotel": "Vacacional", "arrival": "2017-01-08", "score": 0.332879, "canceled": 0}, {"id": 31731, "hotel": "Vacacional", "arrival": "2017-01-02", "score": 0.321018, "canceled": 0}, {"id": 31730, "hotel": "Vacacional", "arrival": "2017-01-02", "score": 0.321018, "canceled": 0}, {"id": 32267, "hotel": "Vacacional", "arrival": "2017-01-18", "score": 0.315664, "canceled": 0}, {"id": 32508, "hotel": "Vacacional", "arrival": "2017-01-25", "score": 0.310931, "canceled": 0}, {"id": 32466, "hotel": "Vacacional", "arrival": "2017-01-25", "score": 0.310687, "canceled": 0}, {"id": 32345, "hotel": "Vacacional", "arrival": "2017-01-21", "score": 0.301759, "canceled": 0}, {"id": 9851, "hotel": "Vacacional", "arrival": "2017-01-12", "score": 0.300651, "canceled": 1}, {"id": 32277, "hotel": "Vacacional", "arrival": "2017-01-07", "score": 0.299218, "canceled": 0}, {"id": 31876, "hotel": "Vacacional", "arrival": "2017-01-08", "score": 0.298689, "canceled": 0}, {"id": 32093, "hotel": "Vacacional", "arrival": "2017-01-14", "score": 0.297102, "canceled": 0}, {"id": 32314, "hotel": "Vacacional", "arrival": "2017-01-21", "score": 0.297096, "canceled": 0}, {"id": 32287, "hotel": "Vacacional", "arrival": "2017-01-19", "score": 0.295629, "canceled": 0}, {"id": 32621, "hotel": "Vacacional", "arrival": "2017-01-28", "score": 0.294641, "canceled": 0}, {"id": 31968, "hotel": "Vacacional", "arrival": "2017-01-09", "score": 0.293697, "canceled": 0}, {"id": 32419, "hotel": "Vacacional", "arrival": "2017-01-05", "score": 0.286752, "canceled": 0}, {"id": 32325, "hotel": "Vacacional", "arrival": "2017-01-16", "score": 0.284577, "canceled": 0}, {"id": 32557, "hotel": "Vacacional", "arrival": "2017-01-16", "score": 0.282064, "canceled": 0}, {"id": 32342, "hotel": "Vacacional", "arrival": "2017-01-17", "score": 0.280779, "canceled": 0}, {"id": 32343, "hotel": "Vacacional", "arrival": "2017-01-17", "score": 0.280779, "canceled": 0}, {"id": 9958, "hotel": "Vacacional", "arrival": "2017-01-28", "score": 0.278659, "canceled": 1}, {"id": 31760, "hotel": "Vacacional", "arrival": "2017-01-02", "score": 0.277272, "canceled": 0}, {"id": 29604, "hotel": "Vacacional", "arrival": "2017-01-10", "score": 0.275069, "canceled": 0}, {"id": 31864, "hotel": "Vacacional", "arrival": "2017-01-08", "score": 0.26526, "canceled": 0}, {"id": 31865, "hotel": "Vacacional", "arrival": "2017-01-08", "score": 0.26526, "canceled": 0}, {"id": 32047, "hotel": "Vacacional", "arrival": "2017-01-08", "score": 0.261067, "canceled": 0}, {"id": 31889, "hotel": "Vacacional", "arrival": "2017-01-06", "score": 0.259057, "canceled": 0}, {"id": 32578, "hotel": "Vacacional", "arrival": "2017-01-24", "score": 0.25659, "canceled": 0}, {"id": 32572, "hotel": "Vacacional", "arrival": "2017-01-24", "score": 0.25659, "canceled": 0}, {"id": 32391, "hotel": "Vacacional", "arrival": "2017-01-19", "score": 0.253482, "canceled": 0}, {"id": 32324, "hotel": "Vacacional", "arrival": "2017-01-22", "score": 0.252607, "canceled": 0}, {"id": 32635, "hotel": "Vacacional", "arrival": "2017-01-16", "score": 0.252229, "canceled": 0}, {"id": 32518, "hotel": "Vacacional", "arrival": "2017-01-22", "score": 0.249476, "canceled": 0}, {"id": 9809, "hotel": "Vacacional", "arrival": "2017-01-04", "score": 0.244617, "canceled": 1}, {"id": 32509, "hotel": "Vacacional", "arrival": "2017-01-22", "score": 0.243162, "canceled": 0}, {"id": 9850, "hotel": "Vacacional", "arrival": "2017-01-12", "score": 0.242053, "canceled": 1}, {"id": 31774, "hotel": "Vacacional", "arrival": "2017-01-03", "score": 0.238291, "canceled": 0}, {"id": 31658, "hotel": "Vacacional", "arrival": "2017-01-02", "score": 0.238056, "canceled": 0}, {"id": 9942, "hotel": "Vacacional", "arrival": "2017-01-28", "score": 0.238056, "canceled": 1}, {"id": 31912, "hotel": "Vacacional", "arrival": "2017-01-05", "score": 0.237972, "canceled": 0}, {"id": 32077, "hotel": "Vacacional", "arrival": "2017-01-10", "score": 0.237102, "canceled": 0}, {"id": 31693, "hotel": "Vacacional", "arrival": "2017-01-03", "score": 0.236517, "canceled": 0}, {"id": 31692, "hotel": "Vacacional", "arrival": "2017-01-03", "score": 0.236517, "canceled": 0}, {"id": 31887, "hotel": "Vacacional", "arrival": "2017-01-06", "score": 0.235334, "canceled": 0}, {"id": 31757, "hotel": "Vacacional", "arrival": "2017-01-02", "score": 0.235334, "canceled": 0}]}}}</script>
+<script>
+(() => {
+  const root = document.getElementById('tmf3-lunes-demo');
+  const data = JSON.parse(document.getElementById('tmf3-demo-data').textContent);
+  const pageSize = 10;
+  const policyButtons = root.querySelectorAll('[data-policy]');
+  const historicalInput = root.querySelector('#tmf3-historical');
+  const previousButton = root.querySelector('#tmf3-previous');
+  const nextButton = root.querySelector('#tmf3-next');
+  let policy = 'global';
+  let historical = false;
+  let page = 0;
+
+  function signed(value) {
+    return value > 0 ? '+' + value : value < 0 ? '−' + Math.abs(value) : '0';
+  }
+
+  function render() {
+    const current = data.policies[policy];
+    const baseline = data.policies.global;
+    policyButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.policy === policy)));
+    historicalInput.checked = historical;
+    root.querySelector('#tmf3-allocation').innerHTML = current.totals.map((hotel, index) =>
+      '<tr><th scope="row">' + hotel.hotel + '</th><td class="text-end">' + hotel.calls +
+      '</td><td class="text-end" data-historical>' + hotel.tp + '</td><td class="text-end" data-historical>' +
+      signed(hotel.tp - baseline.totals[index].tp) + '</td></tr>'
+    ).join('');
+    root.querySelector('#tmf3-total').innerHTML = '<tr><th scope="row">Total</th><td class="text-end">' + data.capacity +
+      '</td><td class="text-end" data-historical>' + current.tp + '</td><td class="text-end" data-historical>' +
+      signed(current.tp - baseline.tp) + '</td></tr>';
+    root.querySelector('#tmf3-list-context').textContent = policy === 'global'
+      ? '66 reservas solo en la lista global · 9 cancelaciones posteriores'
+      : '66 reservas solo en el reparto por hotel · 5 cancelaciones posteriores';
+    if (!historical) {
+      root.querySelector('#tmf3-list-context').textContent = policy === 'global'
+        ? '66 reservas solo en la lista global'
+        : '66 reservas solo en el reparto por hotel';
+    }
+    page = Math.max(0, Math.min(page, Math.ceil(current.movers.length / pageSize) - 1));
+    const offset = page * pageSize;
+    const visible = current.movers.slice(offset, offset + pageSize);
+    root.querySelector('#tmf3-call-list').innerHTML = visible.map(row => {
+      const arrival = row.arrival.slice(8, 10) + '/' + row.arrival.slice(5, 7);
+      return '<tr><td>' + row.id + '</td><td>' + row.hotel + '</td><td>' + arrival +
+        '</td><td class="text-end">' + row.score.toFixed(3).replace('.', ',') +
+        '</td><td data-historical>' + (row.canceled ? 'Se canceló' : 'Sin cancelación') + '</td></tr>';
+    }).join('');
+    root.querySelectorAll('[data-historical]').forEach(element => { element.hidden = !historical; });
+    root.querySelector('#tmf3-page-label').textContent = (offset + 1) + '–' + (offset + visible.length) + ' de ' + current.movers.length + ' reservas';
+    previousButton.disabled = page === 0;
+    nextButton.disabled = offset + pageSize >= current.movers.length;
+  }
+
+  function save() {
+    if (window.openai && window.openai.setWidgetState) {
+      Promise.resolve(window.openai.setWidgetState({
+        modelContent: { fecha: data.date, politica: policy, desenlacesHistoricos: historical },
+        privateContent: { page }
+      })).catch(() => {});
+    }
+  }
+
+  function restore(saved) {
+    const content = saved && saved.modelContent;
+    const detail = saved && saved.privateContent;
+    if (content && Object.hasOwn(data.policies, content.politica)) policy = content.politica;
+    if (content && typeof content.desenlacesHistoricos === 'boolean') historical = content.desenlacesHistoricos;
+    if (detail && Number.isInteger(detail.page)) page = detail.page;
+    render();
+  }
+
+  policyButtons.forEach(button => button.addEventListener('click', () => {
+    policy = button.dataset.policy;
+    page = 0;
+    render();
+    save();
+  }));
+  historicalInput.addEventListener('change', () => {
+    historical = historicalInput.checked;
+    render();
+    save();
+  });
+  previousButton.addEventListener('click', () => { page -= 1; render(); save(); });
+  nextButton.addEventListener('click', () => { page += 1; render(); save(); });
+  window.addEventListener('openai:set_globals', event => {
+    const globals = event.detail && event.detail.globals;
+    if (globals && Object.hasOwn(globals, 'widgetState')) restore(globals.widgetState);
+  });
+  restore(window.openai && window.openai.widgetState);
+})();
+</script>

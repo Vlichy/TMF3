@@ -2,6 +2,14 @@
 
 Continuación de la [Entrega 02](docs/entregas/02_datos_y_preparacion.md). La [memoria de Machine Learning](docs/entregas/03_machine_learning.md) contiene los cinco apartados, las dos ampliaciones y el cierre académico de las observaciones del profesor.
 
+## Demo de un lunes
+
+Descarga o clona el repositorio y abre [docs/demo/lunes_2017-01-02.html](docs/demo/lunes_2017-01-02.html) en un navegador. La demo permite alternar entre cupo global y reparto por hotel y consultar las reservas que cambian de lista. Los desenlaces históricos se muestran al activar su casilla.
+
+Se utiliza el primer lunes de la simulación, el 02/01/2017, porque ambas políticas parten de las mismas 1.152 reservas pendientes. Con 230 llamadas por política, 164 reservas se mantienen y 66 se sustituyen. El hotel vacacional gana cinco detecciones y el urbano pierde nueve, con un balance total de cuatro detecciones menos. Son resultados retrospectivos del ejemplo y las llamadas son simuladas.
+
+Los datos proceden de `reports/cola_persistente_eventos.csv`. La demo incluye la huella SHA-256 de esa fuente y conserva su [fragmento editable](docs/demo/lunes_2017-01-02.fragment.html).
+
 **OBSERVACIÓN DEL PROFESOR RESUELTA**, dentro del alcance de las simulaciones retrospectivas documentadas. Las once pruebas pasan y los 13 informes de resultados se han reproducido con SHA-256 idéntico.
 
 ## Experimentos conservados
